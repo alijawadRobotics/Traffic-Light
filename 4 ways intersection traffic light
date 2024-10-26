@@ -1,0 +1,58 @@
+/* TraficLight_Rev1_ 
+ * Created: 10/26/2024 12:22:49 PM
+ * Author : Ali Jawad
+ */ 
+
+#define F_CPU 16000000UL    //CPU pulse speed definition
+#include <avr/io.h>       //include io library 
+#include <util/delay.h>     //include delay library
+// define control variables
+uint8_t stopwalk = 0b00001001;  //9 or 0x09 
+uint8_t stop = 0b00001000;    //8 or 0x08
+uint8_t caution = 0b00000100; //4 or 0x04
+uint8_t go = 0b00000010;    //2 or 0x02
+uint8_t clear = 0b00001111;   //0 or 0x00
+
+int main(void)
+{
+  //setting lower half of B register to output
+  DDRB |= 0b00001111;
+  //setting lower half of D register to output
+  DDRD |= 0b00001111; 
+    
+    while (1) 
+    {
+    //clear everything
+    PORTB &= ~(clear);
+    PORTD &= ~(clear);
+    //NS stopwalk, EW go
+    PORTB |= (stopwalk);
+    PORTD |= (go);
+    _delay_ms(3000);
+    //clear only changing NS to stop
+    PORTB &= ~(clear);
+    PORTB |= (stop);
+    _delay_ms(1000);
+    //only changing EW to caution
+    PORTD &= ~(clear);
+    PORTD |= (caution);
+    _delay_ms(1000);
+    
+    //clear everything
+    PORTB &= ~(clear);
+    PORTD &= ~(clear);
+    //EW stopwalk, NS go
+    PORTD |= (stopwalk);
+    PORTB |= (go);
+    _delay_ms(3000);
+    //clear only changing EW to stop
+    PORTD &= ~(clear);
+    PORTD |= (stop);
+    _delay_ms(1000);
+    //only changing NS to caution
+    PORTB &= ~(clear);
+    PORTB |= (caution);
+    _delay_ms(1000);
+    
+    }
+}
